@@ -23,11 +23,11 @@ module "project_ci_kms" {
   org_id            = var.org_id
   folder_id         = var.folder_id
   billing_account   = var.billing_account
+  deletion_policy   = "DELETE"
 
   activate_apis = [
     "cloudkms.googleapis.com",
     "serviceusage.googleapis.com",
-    "compute.googleapis.com",
     "iam.googleapis.com",
     "artifactregistry.googleapis.com",
     "cloudresourcemanager.googleapis.com",
@@ -38,7 +38,11 @@ module "project_ci_kms" {
     {
       api   = "cloudbuild.googleapis.com",
       roles = ["roles/cloudbuild.builds.builder"]
-    }
+    },
+    {
+      api   = "compute.googleapis.com",
+      roles = ["roles/owner"]
+    },
   ]
 }
 
@@ -61,5 +65,18 @@ resource "terracurl_request" "poke" {
     ignore_changes = [
       headers,
     ]
+  }
+}
+
+
+resource "null_resource" "cb_warmup" {
+
+  triggers = {
+    project_id = module.project_ci_kms.project_id
+  }
+
+  provisioner "local-exec" {
+    when    = create
+    command = "gcloud builds submit --project ${module.project_ci_kms.project_id} --tag gcr.io/${module.project_ci_kms.project_id}/hello-world ."
   }
 }

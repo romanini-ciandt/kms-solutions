@@ -25,6 +25,20 @@ import (
 
 func TestFakeApacheWebServerModule(t *testing.T) {
 	apacheT := tft.NewTFBlueprintTest(t)
+
+	// apacheT.DefineApply(func(assert *assert.Assertions) {
+	// 	apacheT.DefaultApply(assert)
+
+	// 	projectId := apacheT.GetTFSetupJsonOutput("project_id")
+	// 	t.Cleanup(func() {
+	// 		logsCmd := fmt.Sprintf("logging read --project=%s", projectId.Str)
+	// 		logs := gcloud.Runf(t, logsCmd).Array()
+	// 		for _, log := range logs {
+	// 			t.Logf("%s build-log: %s", projectId.Str, log.Get("textPayload").String())
+	// 		}
+	// 	})
+	// })
+
 	apacheT.DefineVerify(func(assert *assert.Assertions) {
 		apacheT.DefaultVerify(assert)
 
